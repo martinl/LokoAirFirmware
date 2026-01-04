@@ -1,0 +1,146 @@
+stages:
+  - coding-style-checker
+  - ut-build
+  - ut-build-release
+  - pre-release-routine
+  - release-build
+  - release-build-verifier
+  - release-exp-build
+
+variables:
+  GIT_STRATEGY: clone
+  GIT_SUBMODULE_STRATEGY: recursive
+
+image: $CI_REGISTRY_IMAGE/loko:1.0
+
+coding-style-checker-job:
+  stage: coding-style-checker
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  before_script:
+    - git config --global user.name "Mr. Pedantic"
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
+  script:
+    - echo "Code format..."
+    - python build_tools.py --code-format
+    - python build_tools.py --is-repo-clean || exit 0
+    # - python build_tools.py --is-repo-clean ; if ($LastExitCode -ne 0) { exit 0 }
+    - git add .
+    - git commit -m "[CI] Code format"
+    - git push -o ci-skip https://root:$GIT_PUSH_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_REF_NAME && exit 1
+    # - git push -o ci-skip http://root:$GIT_PUSH_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_REF_NAME ; if ($LastExitCode -ne 1) { exit 1 }
+  tags:
+    - Linux-Docker
+  # allow_failure: true
+
+ut-build-job:
+  stage: ut-build
+  interruptible: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  needs:
+    - job: coding-style-checker-job
+  script:
+    - python build_tools.py --tests
+  tags:
+    - Linux-Docker
+  coverage: '/lines......: \d+.\d+%/'
+  artifacts:
+    name: coverage_${CI_PROJECT_NAME}_${CI_COMMIT_REF_NAME}${CI_COMMIT_TITLE}
+    expose_as: "Coverage Report"
+    paths:
+      - build/tests/coverage_report/index.html
+      - build/tests/coverage_report/
+    expire_in: 1 day
+    # reports:
+    #   junit: build/tests/**/cpputest_*.xml
+
+release-build-verifier-job:
+  stage: release-build-verifier
+  interruptible: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  needs:
+    - job: coding-style-checker-job
+  script:
+    - echo "Build all"
+    - python build_tools.py --release
+  tags:
+    - Linux-Docker
+
+pre-release-routine-job:
+  stage: pre-release-routine
+  interruptible: true
+  only:
+    refs:
+      - main
+  before_script:
+    - git config --global user.name "${GITLAB_USER_NAME}"
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\[BUILD]/
+  script:
+    - echo "Pre release checking..."
+    - python build_tools.py --release-preparation
+    - git push -o ci-skip https://root:$GIT_PUSH_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_REF_NAME
+    #remove this pipeline, keep only build pipelines
+    - "curl --header \"PRIVATE-TOKEN: $GIT_PUSH_TOKEN\" --request \"DELETE\" \"https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/pipelines/$CI_PIPELINE_ID\""
+    #- "./Tools/curl/curl.exe --header \"PRIVATE-TOKEN: $GIT_PUSH_TOKEN\" --request \"DELETE\" \"https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/pipelines/$CI_PIPELINE_ID\""
+  tags:
+    - Linux-Docker
+
+ut-build-release-job:
+  stage: ut-build-release
+  interruptible: true
+  only:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\[BUILD]/
+  script:
+    - python build_tools.py --tests
+  tags:
+    - Linux-Docker
+  coverage: '/lines......: \d+.\d+%/'
+  artifacts:
+    name: coverage_${CI_PROJECT_NAME}_${CI_COMMIT_REF_NAME}${CI_COMMIT_TITLE}
+    expose_as: "Coverage Report"
+    expire_in: 1 day
+    paths:
+      - build/tests/coverage_report/index.html
+      - build/tests/coverage_report/
+
+release-build-job:
+  stage: release-build
+  interruptible: true
+  dependencies: []
+  only:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\[BUILD]/
+  needs:
+    - job: ut-build-release-job
+  script:
+    - python build_tools.py --release
+  tags:
+    - Linux-Docker
+  artifacts:
+    name: ${CI_PROJECT_NAME}_${CI_COMMIT_REF_NAME}${CI_COMMIT_TITLE}
+    paths:
+      - build/out*
+      - release/*
+
+release-exp-build-job:
+  stage: release-exp-build
+  interruptible: true
+  dependencies: []
+  only:
+    refs:
+      - /^exp\/.*$/
+  script:
+    - python build_tools.py --release
+  tags:
+    - Linux-Docker
+  artifacts:
+    name: ${CI_PROJECT_NAME}_${CI_COMMIT_REF_NAME}${CI_COMMIT_TITLE}
+    paths:
+      - build/out*
+      - release/*

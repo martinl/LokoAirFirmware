@@ -1,0 +1,37 @@
+{
+    "out_c_file": "./../../Core/settings/settings.c",
+    "out_h_file": "./../../Core/settings/settings.h",
+    "in_json_file": "./project.json",
+    "settings": [
+        {
+            "name": "id_1",
+            "type": "uint32_t",
+            "default": 0
+        },
+        {
+            "name": "id_2",
+            "type": "uint32_t",
+            "default": 0
+        },
+        {
+            "name": "lora_frequency_hz",
+            "type": "uint32_t",
+            "default": 866000000
+        },
+        {
+            "name": "auto_wakeup_period_s",
+            "type": "uint32_t",
+            "default": 60
+        },
+        {
+            "name": "gnss_trace_save_mult",
+            "type": "uint32_t",
+            "default": 5
+        },
+        {
+            "name": "debug_output",
+            "type": "bool",
+            "default": 0
+        }
+    ]
+}

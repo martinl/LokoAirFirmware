@@ -1,0 +1,8 @@
+Debug
+Release
+.settings
+/build
+/*.launch
+/debug_loko_seeed_e5_board
+release
+release_bin

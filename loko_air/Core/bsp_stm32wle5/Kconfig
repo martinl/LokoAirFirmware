@@ -1,0 +1,21 @@
+mainmenu "STM32WL BSP Configuration"
+
+config BSP_USE_ADC
+    bool "Add to build RTC interface"
+    default n
+
+config BSP_USE_RTC
+    bool "Add to build RTC interface"
+    default n
+
+config BSP_USE_UART
+    bool "Add to build RTC interface"
+    default n
+
+config BSP_USE_FLASH
+    bool "Add to build RTC interface"
+    default n
+
+config BSP_USE_RADIO
+    bool "Add to build RTC interface"
+    default n

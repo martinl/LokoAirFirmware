@@ -1,0 +1,16 @@
+add_subdirectory(cmd_line)
+add_subdirectory(crc16)
+add_subdirectory(encrypt_p2p_payload)
+add_subdirectory(gnss_trace)
+add_subdirectory(log_)
+add_subdirectory(queue)
+add_subdirectory(settings)
+add_subdirectory(Src)
+add_subdirectory(stm32_bootloader_host_protocol)
+
+
+if(BUILD_CONFIG_UNIT_TESTS)
+    add_subdirectory(bsp_cpputests)
+else()
+    add_subdirectory(bsp_stm32wle5)
+endif()

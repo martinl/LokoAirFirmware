@@ -1,0 +1,21 @@
+mainmenu "LoKo project configuration"
+
+choice
+    prompt "BSP name"
+    default LOKO_AIR
+
+    config LOKO_AIR
+        bool "LOKO_AIR"
+    config LOKO_AIR_SEEED_E5
+         bool "LOKO_AIR_SEEED_E5"
+    config LOKO_CPPUTEST
+         bool "LOKO_CPPUTEST"
+endchoice
+
+
+config BOOTLOADER_BUILD
+    bool "is bootloader project"
+    default n
+
+
+rsource "Core/bsp_stm32wle5/Kconfig"

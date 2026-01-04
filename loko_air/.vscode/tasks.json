@@ -1,0 +1,87 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "cmake/shell.bat",
+            "type": "shell",
+            "args": [
+                "\"make ${command:cpptools.activeConfigName}.bin\""
+            ],
+            "presentation": {
+                "reveal": "always",
+                "echo": true
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceRoot}/build"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "clean app",
+            "command": "cmake/shell.bat",
+            "type": "shell",
+            "args": [
+                "\"make clean\""
+            ],
+            "presentation": {
+                "reveal": "always",
+                "echo": true
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceRoot}/build"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "download app",
+            "command": "cmake/shell.bat",
+            "type": "shell",
+            "args": [
+                "\"make flash\""
+            ],
+            "presentation": {
+                "reveal": "always",
+                "echo": true
+            }
+        },
+        {
+            "label": "GitClean",
+            "type": "shell",
+            "command": "git",
+            "args": [
+                "clean",
+                "-dfX"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+    ]
+}

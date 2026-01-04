@@ -1,0 +1,71 @@
+{
+    "C_Cpp": {
+        "default.configurationProvider": "ms-vscode.cmake-tools",
+        "autoAddFileAssociations": false,
+    },
+    // "clang-format.executable": "c:/Program Files/LLVM/bin/clang-format",
+    "clang-tidy": {
+        // "executable": "/usr/bin/clang-tidy",
+        "compilerArgs": [
+            "-CONFIG_LOKO_AIR=1",
+            "-include ${workspaceFolder}/Core/Inc/build_conf.h"
+        ],
+        "lintOnSave": true,
+    },
+    "cmake": {
+        "sourceDirectory": "${workspaceFolder}",
+        "generator": "Unix Makefiles",
+        "configureOnOpen": true,
+        "configureArgs": [
+            //"-DTOOLCHAIN_PREFIX=/home/dev/gcc-arm-none-eabi-6-2017-q2-update",
+            "-DTOOLCHAIN_PREFIX=${env:GCC_PATH}",
+            "--fresh"
+        ],
+    },
+    "cortex-debug.armToolchainPath": "${env:GCC_PATH}/bin/",
+    "editor": {
+        "formatOnSave": true,
+        "formatOnType": true,
+        "tabCompletion": "off",
+        "tabSize": 4,
+        "renderWhitespace": "all",
+        "defaultFormatter": "xaver.clang-format",
+    },
+    "files": {
+        "trimTrailingWhitespace": true,
+        "autoSave": "onFocusChange",
+        "associations": {
+            "*.h": "c",
+            "*.c": "c",
+        }
+    },
+    "sonarlint": {
+        "connectedMode.project": {
+            "connectionId": "",
+            "projectKey": ""
+        },
+        "rules": {
+            "c:S1066": { //Merge this "if" statement with the enclosing one.
+                "level": "off"
+            },
+            "c:S134": { //Refactor this code to not nest more than 3 if|for|do|while|switch statements.
+                "level": "off"
+            },
+            "c:S3776": { //Refactor this function to reduce its Cognitive Complexity from 31 to the 25 allowed.
+                "level": "off"
+            }
+        },
+    },
+    "markiscodecoverage.searchCriteria": "build/tests/coverage_report/*.info",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.python"
+    },
+    "sonarlint.pathToCompileCommands": "${workspaceFolder}/build/compile_commands.json",
+    "VsCodeTaskButtons.tasks": [
+        {
+            "label": "Git Clean",
+            "task": "GitClean",
+            "tooltip": "Run git clean",
+        },
+    ]
+}
